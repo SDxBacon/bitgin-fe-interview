@@ -3,6 +3,7 @@ import { useQuery, useMutation, gql } from "@apollo/client";
 
 import TodoForm from "../components/TodoForm/TodoForm";
 import TodoItem from "../components/TodoItem/TodoItem";
+import BackdropLoading from "../components/BackdropLoading/BackdropLoading";
 
 export type Todo = {
   id: string;
@@ -84,7 +85,7 @@ const TodoApp = () => {
   /**
    * renderer
    */
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <BackdropLoading />;
   if (error) return <p>Error: {error.message}</p>;
   return (
     <Box maxWidth={400} mx="auto" padding={3}>
