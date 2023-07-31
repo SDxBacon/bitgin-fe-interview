@@ -1,3 +1,6 @@
+/**
+ * 這是 standalone 版本的 node.js apollo server, 會聽port 4000
+ */
 const express = require("express");
 const { ApolloServer, gql } = require("apollo-server-express");
 const { v4: uuidv4 } = require("uuid");
