@@ -1,29 +1,54 @@
-# Apollo Server and Client Example
+# Next.JS + Apollo + MUI TodoList App
 
-[Apollo](https://www.apollographql.com/client/) is a GraphQL client that allows you to easily query the exact data you need from a GraphQL server. In addition to fetching and mutating data, Apollo analyzes your queries and their results to construct a client-side cache of your data, which is kept up to date as further queries and mutations are run. The integration with Next and Apollo Server is implemented using the [apollo-server-integration-next](https://github.com/apollo-server-integrations/apollo-server-integration-next) community package.
+這個範例是使用 Next.JS + Apollo + MUI 所做的 Todo List 範例程式。  
+專案的 templates 使用 Next.JS 提供的 [Apollo Server and Client Example](https://github.com/vercel/next.js/tree/canary/examples/api-routes-apollo-server-and-client)
 
-In this simple example, we integrate Apollo seamlessly with [Next.js data fetching methods](https://nextjs.org/docs/basic-features/data-fetching) to fetch queries in the server and hydrate them in the browser.
-
-## Deploy your own
-
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or preview live with [StackBlitz](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/api-routes-apollo-server-and-client)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/next.js/tree/canary/examples/api-routes-apollo-server-and-client&project-name=api-routes-apollo-server-and-client&repository-name=api-routes-apollo-server-and-client)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
-
-```bash
-npx create-next-app --example api-routes-apollo-server-and-client api-routes-apollo-server-and-client-app
-```
+> 該模板有移植社群的 apollo-server-integration-next，所以可以同步 serve 一個 graphql server
 
 ```bash
 yarn create next-app --example api-routes-apollo-server-and-client api-routes-apollo-server-and-client-app
 ```
 
+## How to use
+
+1. Clone the repo
+
 ```bash
-pnpm create next-app --example api-routes-apollo-server-and-client api-routes-apollo-server-and-client-app
+git clone https://github.com/SDxBacon/nextjs-apollo-todo-list-example.git
 ```
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+2. 安裝 dependencies 與執行
+
+```bash
+yarn && yarn dev
+```
+
+## Standalone version server
+
+專案裡面也有一個 standalone 版本供 debug 的 graphql 伺服器。  
+可以參照以下設定快速換成 standalone 版本：
+
+1. 執行 standalone 版本伺服器
+
+```bash
+cd ./server-standalone
+yarn && yarn start
+```
+
+2. 修改 next.js 中的 graphql api url
+
+```diff
+function createIsomorphLink() {
+  if (typeof window === "undefined") {
+    return new SchemaLink({ schema });
+  } else {
+    return new HttpLink({
+-      uri: "/api/graphql",
++      uri: "http://localhost:4000/graphql"
+      credentials: "same-origin",
+    });
+  }
+}
+```
+
+> NOTE: 這是 localhost 端 debug 用，沒處理 CORS...等其餘問題
