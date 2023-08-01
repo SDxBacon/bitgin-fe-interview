@@ -39,7 +39,6 @@ const TOGGLE_TODO = gql`
   mutation toggleTodo($id: ID!) {
     toggleTodo(id: $id) {
       id
-      text
       completed
     }
   }
@@ -58,14 +57,73 @@ const DELETE_TODO = gql`
  */
 const TodoApp = () => {
   const { loading, error, data } = useQuery<TData>(GET_TODOS);
+  /** Mutation: addTodo */
   const [addTodo] = useMutation(ADD_TODO, {
-    refetchQueries: [{ query: GET_TODOS }],
+    // 把伺服器回傳的新的 todo 物件，加進 cache 中
+    update(cache, { data: { addTodo: newToDo } }) {
+      cache.updateQuery({ query: GET_TODOS }, (data) => ({
+        todos: data.todos.concat(newToDo),
+      }));
+    },
   });
+  /** Mutation: toggleTodo */
   const [toggleTodo] = useMutation(TOGGLE_TODO, {
-    refetchQueries: [{ query: GET_TODOS }],
+    update(cache, { data: { toggleTodo } }) {
+      // 如果 target.id 不存在，API會回傳 null
+      if (!toggleTodo) return;
+
+      cache.modify({
+        fields: {
+          todos(existingTodos = []) {
+            // existingTodos 是空陣列，do nothing
+            if (!existingTodos.length) return existingTodos;
+            /**
+             * 如果 existingTodos 有值 & Id 在列表中，更新 cache
+             */
+            const index = existingTodos.findIndex(
+              (todo) => todo.id === toggleTodo?.id
+            );
+            if (index > -1) {
+              // create newTodoRef
+              const newTodoRef = cache.writeFragment({
+                data: toggleTodo,
+                fragment: gql`
+                  fragment ToggledTodo on Todo {
+                    id
+                    completed
+                  }
+                `,
+              });
+              const nextTodos = [...existingTodos]; // swallow clone todos object
+              nextTodos[index] = newTodoRef; // replace newTodoRef
+              return [...existingTodos]; // return
+            }
+
+            return existingTodos;
+          },
+        },
+      });
+    },
   });
+  /** Mutation: deleteTodo */
   const [deleteTodo] = useMutation(DELETE_TODO, {
-    refetchQueries: [{ query: GET_TODOS }],
+    update(cache, { data: { deleteTodo } }) {
+      // 如果 target.id 不存在，API會回傳 null
+      if (!deleteTodo) return;
+      // 從 cachue 裡面抓出 existingTodos，
+      // 過濾出不含被刪除的 Todo 物件們，放在 newTodos 中。
+      // 然後更新 cache
+      const { todos: existingTodos }: { todos: Todo[] } = cache.readQuery({
+        query: GET_TODOS,
+      });
+      const newTodos = existingTodos.filter(
+        (t: Todo) => t.id !== deleteTodo.id
+      );
+      cache.writeQuery({
+        query: GET_TODOS,
+        data: { todos: newTodos },
+      });
+    },
   });
 
   const handleAddTodo = (text: string) => {
