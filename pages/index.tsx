@@ -110,19 +110,10 @@ const TodoApp = () => {
     update(cache, { data: { deleteTodo } }) {
       // 如果 target.id 不存在，API會回傳 null
       if (!deleteTodo) return;
-      // 從 cachue 裡面抓出 existingTodos，
-      // 過濾出不含被刪除的 Todo 物件們，放在 newTodos 中。
-      // 然後更新 cache
-      const { todos: existingTodos }: { todos: Todo[] } = cache.readQuery({
-        query: GET_TODOS,
-      });
-      const newTodos = existingTodos.filter(
-        (t: Todo) => t.id !== deleteTodo.id
-      );
-      cache.writeQuery({
-        query: GET_TODOS,
-        data: { todos: newTodos },
-      });
+      // 過濾出不含被刪除的 Todo 物件們，更新 cache
+      cache.updateQuery({ query: GET_TODOS }, (data) => ({
+        todos: data.todos.filter((t: Todo) => t.id !== deleteTodo.id),
+      }));
     },
   });
 
