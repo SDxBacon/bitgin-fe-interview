@@ -13,9 +13,9 @@ const TodoForm = ({ onSubmit }: TodoFormProps) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim()) return; // 如果空字串, do nothing
     if (onSubmit) onSubmit(text);
-    setText("");
+    setText(""); // reset state
   };
 
   return (

@@ -93,12 +93,16 @@ const TodoApp = () => {
         Next.js + GraphQL + MUI Todo List
       </Typography>
 
-      {/* TodoForm */}
+      {/**
+       * TodoForm
+       * 新增 TODO 項目的頁面元件
+       */}
       <Paper component={TodoForm} onSubmit={handleAddTodo} />
 
       {
         /**
          * TodoList
+         * 顯示 TODO 項目，用來 Toggle / Delete 的頁面元件
          */
         data.todos.map((todo) => (
           <TodoItem
