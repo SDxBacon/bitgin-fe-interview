@@ -96,7 +96,7 @@ const TodoApp = () => {
               });
               const nextTodos = [...existingTodos]; // swallow clone todos object
               nextTodos[index] = newTodoRef; // replace newTodoRef
-              return [...existingTodos]; // return
+              return nextTodos; // return
             }
 
             return existingTodos;
